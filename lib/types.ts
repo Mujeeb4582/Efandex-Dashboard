@@ -35,3 +35,20 @@ export interface DashboardStats {
 		period: string;
 	};
 }
+
+export interface DashboardState {
+	stats: DashboardStats;
+	bookings: Booking[];
+	users: User[];
+	currentPage: number;
+	searchQuery: string;
+	selectedDate: string;
+
+	// Actions
+	setSearchQuery: (query: string) => void;
+	setCurrentPage: (page: number) => void;
+	setSelectedDate: (date: string) => void;
+	approveUser: (userId: string) => void;
+	declineUser: (userId: string) => void;
+	updateBookingStatus: (bookingId: string, status: Booking['status']) => void;
+}

@@ -11,7 +11,7 @@ export function formatCurrency(amount: number): string {
 		currency: 'USD',
 		notation: 'compact',
 		compactDisplay: 'short',
-		maximumFractionDigits: 1,
+		maximumFractionDigits: 2,
 	}).format(amount);
 }
 

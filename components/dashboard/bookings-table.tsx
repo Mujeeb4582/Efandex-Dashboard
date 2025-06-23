@@ -2,17 +2,19 @@
 
 import { useState } from 'react';
 import {
-	Search,
 	Calendar,
-	Download,
-	MoreHorizontal,
-	ChevronLeft,
-	ChevronRight,
+	Send,
+	EllipsisVertical,
+	CircleCheck,
+	ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useDashboardStore } from '@/store/dashboard-store';
+import { TableHeader } from '../ui/table-header';
+import { Booking } from '@/lib/types';
+import { DataTable } from '../ui/table-body';
+import { Pagination } from '../ui/pagination';
 
 export function BookingsTable() {
 	const { bookings, selectedDate } = useDashboardStore();
@@ -44,128 +46,106 @@ export function BookingsTable() {
 
 	const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
 
+	const columns = [
+		{
+			key: 'guestName',
+			label: 'Name',
+			render: (booking: Booking) => (
+				<div className='text-efandex-gray-900 font-medium'>
+					<span>{booking.guestName}</span>
+				</div>
+			),
+		},
+		{
+			key: 'status',
+			label: 'Status',
+			render: (booking: Booking) => (
+				<Badge variant={getStatusVariant(booking.status)}>
+					{booking.status === 'Completed' ? (
+						<>
+							<CircleCheck className='mr-1' />
+							{booking.status}
+						</>
+					) : (
+						<>
+							{/* dot */}
+							<div className='size-2 mr-1 rounded-full bg-current' />
+							{booking.status}
+						</>
+					)}
+				</Badge>
+			),
+		},
+		{
+			key: 'price',
+			label: 'Price',
+			render: (booking: Booking) => `$${booking.price.toFixed(2)}`,
+		},
+		{
+			key: 'capacity',
+			label: 'Capacity',
+		},
+		{
+			key: 'duration',
+			label: 'Duration',
+		},
+		{
+			key: 'action',
+			label: 'Action',
+			render: () => (
+				<Button
+					variant='ghost'
+					size='sm'
+					className='text-black font-medium text-xs'
+				>
+					View Booking Details
+					<ArrowRight className='ml-2 size-4' />
+				</Button>
+			),
+		},
+	];
+
 	return (
 		<div className='bg-white rounded-lg border border-gray-200 mb-8'>
-			<div className='flex items-center justify-between p-6 border-b border-gray-200'>
-				<h2 className='text-lg font-semibold text-gray-900'>Recent Bookings</h2>
-				<div className='flex items-center space-x-4'>
-					<div className='relative'>
-						<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
-						<Input
-							type='text'
-							placeholder='Search here...'
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-							className='pl-10 w-64'
-						/>
-					</div>
-					<Button
-						variant='outline'
-						size='sm'
-					>
-						<Calendar className='h-4 w-4 mr-2' />
-						{selectedDate}
-					</Button>
-					<Button
-						variant='default'
-						size='sm'
-					>
-						<Download className='h-4 w-4 mr-2' />
-						Export
-					</Button>
-					<Button
-						variant='ghost'
-						size='icon'
-					>
-						<MoreHorizontal className='h-4 w-4' />
-					</Button>
-				</div>
-			</div>
-
-			<div className='overflow-x-auto'>
-				<table className='w-full'>
-					<thead className='border-b border-gray-200'>
-						<tr>
-							<th className='text-left p-4 font-medium text-gray-700'>Name</th>
-							<th className='text-left p-4 font-medium text-gray-700'>
-								Status
-							</th>
-							<th className='text-left p-4 font-medium text-gray-700'>Price</th>
-							<th className='text-left p-4 font-medium text-gray-700'>
-								Capacity
-							</th>
-							<th className='text-left p-4 font-medium text-gray-700'>
-								Duration
-							</th>
-							<th className='text-left p-4 font-medium text-gray-700'>
-								Action
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{paginatedBookings.map((booking) => (
-							<tr
-								key={booking.id}
-								className='border-b border-gray-100 hover:bg-gray-50'
-							>
-								<td className='p-4 text-gray-600'>{booking.guestName}</td>
-								<td className='p-4'>
-									<Badge variant={getStatusVariant(booking.status)}>
-										{booking.status}
-									</Badge>
-								</td>
-								<td className='p-4 text-gray-600'>${booking.price}</td>
-								<td className='p-4 text-gray-600'>{booking.capacity}</td>
-								<td className='p-4 text-gray-600'>{booking.duration}</td>
-								<td className='p-4'>
-									<Button
-										variant='outline'
-										size='sm'
-									>
-										View Booking Details
-									</Button>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
-
-			<div className='flex items-center justify-between p-4 border-t border-gray-200'>
+			<TableHeader
+				title='Recent Bookings'
+				searchValue={searchTerm}
+				onSearchChange={setSearchTerm}
+			>
 				<Button
 					variant='outline'
-					size='sm'
-					onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-					disabled={currentPage === 1}
+					size='lg'
+					className='text-sm'
 				>
-					<ChevronLeft className='h-4 w-4 mr-2' />
-					Previous
+					{selectedDate}
+					<Calendar className='size-4 mr-2' />
 				</Button>
-				<div className='flex space-x-2'>
-					{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-						<Button
-							key={page}
-							variant={currentPage === page ? 'default' : 'outline'}
-							size='sm'
-							className='w-8 h-8 p-0'
-							onClick={() => setCurrentPage(page)}
-						>
-							{page}
-						</Button>
-					))}
-				</div>
 				<Button
-					variant='outline'
-					size='sm'
-					onClick={() =>
-						setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-					}
-					disabled={currentPage === totalPages}
+					variant='default'
+					size='lg'
 				>
-					Next
-					<ChevronRight className='h-4 w-4 ml-2' />
+					Export
+					<Send className='size-4 mr-2' />
 				</Button>
-			</div>
+				<Button
+					variant='ghost'
+					size='icon'
+				>
+					<EllipsisVertical className='size-6 text-efandex-gray-300' />
+				</Button>
+			</TableHeader>
+
+			<DataTable
+				columns={columns}
+				data={paginatedBookings}
+				rowKey={(booking) => booking.id}
+			/>
+
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onPageChange={(page) => setCurrentPage(page)}
+			/>
 		</div>
 	);
 }

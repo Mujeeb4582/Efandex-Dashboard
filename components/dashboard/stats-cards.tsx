@@ -60,7 +60,7 @@ export function StatsCards() {
 	];
 
 	return (
-		<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+		<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 font-inter'>
 			{cards.map((card, index) => (
 				<Card
 					key={index}
@@ -110,7 +110,7 @@ export function StatsCards() {
 					<CardContent className='pt-0 w-full'>
 						<div className='flex justify-between w-full'>
 							<div className=''>
-								<CardTitle className='text-base font-medium text-primary'>
+								<CardTitle className='text-base font-medium font-poppins text-primary'>
 									{card.title}
 								</CardTitle>
 								<h3 className='text-[26px] font-bold text-black mb-1'>
@@ -169,7 +169,25 @@ export function StatsCards() {
 											fill={`url(#gradient-${index})`}
 											stroke={card.color}
 											strokeWidth={2}
-											dot={false}
+											dot={({ index: i, ...props }) =>
+												i === 0 || i === card.chartData.length - 1 ? (
+													<circle
+														cx={props.cx}
+														cy={props.cy}
+														r={4}
+														fill={card.color}
+														stroke='white'
+														strokeWidth={1}
+													/>
+												) : (
+													<circle
+														cx={props.cx}
+														cy={props.cy}
+														r={0}
+														fill='transparent'
+													/>
+												)
+											}
 										/>
 									</AreaChart>
 								</ChartContainer>

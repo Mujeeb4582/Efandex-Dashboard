@@ -43,6 +43,14 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-dropdownText: var(--dropdownText);
+  --color-efandex-gray-light: var(--efandex-gray-light);
+  --color-efandex-gray-normal: var(--efandex-gray-normal);
+  --color-efandex-gray-50: var(--efandex-gray-50);
+  --color-efandex-gray-300: var(--efandex-gray-300);
+  --color-efandex-gray-400: var(--efandex-gray-400);
+  --color-efandex-gray-500: var(--efandex-gray-500);
+  --color-efandex-gray-900: var(--efandex-gray-900);
 }
 
 :root {
@@ -79,6 +87,13 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
   --dropdownText: #344054;
+  --efandex-gray-light: #F2F2F2;
+  --efandex-gray-normal: #818181;
+  --efandex-gray-50: #F9FAFB;
+  --efandex-gray-300: #98A2B3;
+  --efandex-gray-400: #898E95;
+  --efandex-gray-500: #667085;
+  --efandex-gray-900: #101828;
 }
 
 .dark {
