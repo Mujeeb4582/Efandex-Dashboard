@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,8 +8,18 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { TrendingUp, TrendingDown, ChevronDown } from 'lucide-react';
+import {
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+} from '@/components/ui/chart';
+import { AreaChart, Area } from 'recharts';
 import { useDashboardStore } from '@/store/dashboard-store';
-import { formatCurrency, formatPercentage } from '@/lib/utils';
+import {
+	formatCurrency,
+	formatPercentage,
+	generateChartData,
+} from '@/lib/utils';
 import { useState } from 'react';
 
 const timeRanges = ['Last Month', 'Last 3 Months', 'Last Year'];
@@ -17,9 +27,9 @@ const timeRanges = ['Last Month', 'Last 3 Months', 'Last Year'];
 export function StatsCards() {
 	const { stats } = useDashboardStore();
 	const [selectedPeriods, setSelectedPeriods] = useState([
-		stats.activeUsers.period,
-		stats.totalProperties.period,
-		stats.totalRevenue.period,
+		'Last Month',
+		'Last Month',
+		'Last Month',
 	]);
 
 	const cards = [
@@ -27,149 +37,63 @@ export function StatsCards() {
 			title: 'Active Users',
 			value: stats.activeUsers.count.toLocaleString(),
 			change: stats.activeUsers.change,
-			color: {
-				path: '#3b82f6',
-				gradient: 'url(#blueGradient)',
-			},
+			period: stats.activeUsers.period,
+			color: '#2A85FF',
+			chartData: generateChartData(stats.activeUsers.change > 0, 120),
 		},
 		{
 			title: 'Total Properties',
 			value: stats.totalProperties.count,
 			change: stats.totalProperties.change,
-			color: {
-				path: '#ef4444',
-				gradient: 'url(#redGradient)',
-			},
+			period: stats.totalProperties.period,
+			color: '#FA6262',
+			chartData: generateChartData(stats.totalProperties.change > 0, 120),
 		},
 		{
 			title: 'Total Revenue',
 			value: formatCurrency(stats.totalRevenue.amount),
 			change: stats.totalRevenue.change,
-			color: {
-				path: '#10b981',
-				gradient: 'url(#greenGradient)',
-			},
+			period: stats.totalRevenue.period,
+			color: '#24BC73',
+			chartData: generateChartData(stats.totalRevenue.change > 0, 120),
 		},
 	];
 
 	return (
-		<>
-			{/* SVG Gradients */}
-			<svg
-				width='0'
-				height='0'
-			>
-				<defs>
-					<linearGradient
-						id='blueGradient'
-						x1='0'
-						y1='0'
-						x2='0'
-						y2='1'
-					>
-						<stop
-							offset='0%'
-							stopColor='#3b82f6'
-							stopOpacity='0.5'
-						/>
-						<stop
-							offset='100%'
-							stopColor='#3b82f6'
-							stopOpacity='0'
-						/>
-					</linearGradient>
-					<linearGradient
-						id='redGradient'
-						x1='0'
-						y1='0'
-						x2='0'
-						y2='1'
-					>
-						<stop
-							offset='0%'
-							stopColor='#ef4444'
-							stopOpacity='0.5'
-						/>
-						<stop
-							offset='100%'
-							stopColor='#ef4444'
-							stopOpacity='0'
-						/>
-					</linearGradient>
-					<linearGradient
-						id='greenGradient'
-						x1='0'
-						y1='0'
-						x2='0'
-						y2='1'
-					>
-						<stop
-							offset='0%'
-							stopColor='#10b981'
-							stopOpacity='0.5'
-						/>
-						<stop
-							offset='100%'
-							stopColor='#10b981'
-							stopOpacity='0'
-						/>
-					</linearGradient>
-				</defs>
-			</svg>
+		<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+			{cards.map((card, index) => (
+				<Card
+					key={index}
+					className='bg-white border border-gray-200'
+				>
+					<CardHeader>
+						<div className='flex items-center justify-between'>
+							<DropdownMenu>
+								<DropdownMenuTrigger className='text-[10px] text-[#344054]  flex items-center gap-1 focus:outline-none'>
+									{selectedPeriods[index]} <ChevronDown className='h-3 w-3' />
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align='start'>
+									{timeRanges.map((range) => (
+										<DropdownMenuItem
+											key={range}
+											onClick={() => {
+												const newPeriods = [...selectedPeriods];
+												newPeriods[index] = range;
+												setSelectedPeriods(newPeriods);
+											}}
+											className='text-[10px] text-[#344054] font-normal hover:bg-gray-100'
+										>
+											{range}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
 
-			<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-				{cards.map((card, index) => (
-					<Card key={index}>
-						<CardContent className='p-6'>
-							<div className='flex items-center justify-between mb-4'>
-								<p className='text-sm text-gray-600'>{card.title}</p>
-								<DropdownMenu>
-									<DropdownMenuTrigger className='text-xs text-gray-500 flex items-center gap-1 focus:outline-none'>
-										{selectedPeriods[index]} <ChevronDown className='h-4 w-4' />
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align='end'>
-										{timeRanges.map((range) => (
-											<DropdownMenuItem
-												key={range}
-												onClick={() => {
-													const newPeriods = [...selectedPeriods];
-													newPeriods[index] = range;
-													setSelectedPeriods(newPeriods);
-												}}
-											>
-												{range}
-											</DropdownMenuItem>
-										))}
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
-
+							{/* Change Indicator */}
 							<div className='flex items-center justify-between'>
-								<h3 className='text-2xl font-bold text-gray-900'>
-									{card.value}
-								</h3>
-								{/* Graph area */}
-								<svg
-									viewBox='0 0 100 40'
-									className='h-12 w-24'
-								>
-									<path
-										d='M0,30 C20,10 40,35 60,15 C80,-5 100,20 100,20 L100,40 L0,40 Z'
-										fill={card.color.gradient}
-									/>
-									<path
-										d='M0,30 C20,10 40,35 60,15 C80,-5 100,20'
-										stroke={card.color.path}
-										strokeWidth='2'
-										fill='none'
-									/>
-								</svg>
-							</div>
-
-							<div className='flex items-center mt-4'>
 								<div
-									className={`flex items-center text-sm ${
-										card.change > 0 ? 'text-green-600' : 'text-red-600'
+									className={`flex items-center text-xs font-poppins font-normal ${
+										card.change > 0 ? 'text-[#24BC73]' : 'text-[#F57E77]'
 									}`}
 								>
 									{card.change > 0 ? (
@@ -179,14 +103,81 @@ export function StatsCards() {
 									)}
 									{formatPercentage(card.change)}
 								</div>
-								<span className='text-xs text-gray-500 ml-2'>
-									{selectedPeriods[index]}
-								</span>
 							</div>
-						</CardContent>
-					</Card>
-				))}
-			</div>
-		</>
+						</div>
+					</CardHeader>
+
+					<CardContent className='pt-0 w-full'>
+						<div className='flex justify-between w-full'>
+							<div className=''>
+								<CardTitle className='text-base font-medium text-primary'>
+									{card.title}
+								</CardTitle>
+								<h3 className='text-[26px] font-bold text-black mb-1'>
+									{card.value}
+								</h3>
+								<p className='text-xs text-secondary'>{card.period}</p>
+							</div>
+
+							{/* Chart */}
+							<div>
+								<ChartContainer
+									config={{
+										value: {
+											label: 'Value',
+											color: card.color,
+										},
+									}}
+									className='h-16 w-full'
+								>
+									<AreaChart
+										data={card.chartData}
+										height={64}
+										margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
+									>
+										{/* Gradient for area fill */}
+										<defs>
+											<linearGradient
+												id={`gradient-${index}`}
+												x1='0'
+												y1='0'
+												x2='0'
+												y2='1'
+											>
+												<stop
+													offset='0%'
+													stopColor={card.color}
+													stopOpacity={0.7}
+												/>
+												<stop
+													offset='100%'
+													stopColor={card.color}
+													stopOpacity={0.05}
+												/>
+											</linearGradient>
+										</defs>
+
+										{/* Tooltip */}
+										<ChartTooltip
+											content={<ChartTooltipContent indicator='line' />}
+										/>
+
+										{/* Chart line/area */}
+										<Area
+											dataKey='value'
+											type='monotone'
+											fill={`url(#gradient-${index})`}
+											stroke={card.color}
+											strokeWidth={2}
+											dot={false}
+										/>
+									</AreaChart>
+								</ChartContainer>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			))}
+		</div>
 	);
 }

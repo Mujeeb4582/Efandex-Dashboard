@@ -25,7 +25,7 @@ const mockStats: DashboardStats = {
 		change: -10.66,
 		period: 'Overall last month',
 	},
-	totalRevenue: { amount: 900000, change: -10.5, period: 'Overall this month' },
+	totalRevenue: { amount: 900000, change: 10.5, period: 'Overall this month' },
 };
 
 const mockBookings: Booking[] = [
