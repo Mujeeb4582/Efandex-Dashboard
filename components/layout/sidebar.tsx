@@ -88,7 +88,7 @@ export function Sidebar() {
 					<Shield className='mr-3 h-5 w-5' />
 					Privacy Policy
 				</Link>
-				<Button className='flex w-full items-center justify-start py-3 text-sm bg-[#EA4335] font-medium text-white rounded-lg hover:bg-red-50 transition-colors h-14'>
+				<Button className='flex w-full items-center justify-start py-3 text-sm bg-[#EA4335] font-medium text-white rounded-lg hover:bg-[#D32F2F] transition-colors h-14'>
 					<LogOut className='ml-2 mr-2 h-5 w-5' />
 					Logout
 				</Button>
